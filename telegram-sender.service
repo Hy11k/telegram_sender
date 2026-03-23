@@ -1,0 +1,64 @@
+# systemd service файл для Telegram Message Sender
+# =================================================
+#
+# Инструкция по установке:
+# 1. Скопируйте этот файл в: /etc/systemd/system/telegram-sender.service
+#    sudo cp telegram-sender.service /etc/systemd/system/
+#
+# 2. Отредактируйте пути и переменные окружения под вашу систему
+#
+# 3. Включите и запустите сервис:
+#    sudo systemctl daemon-reload
+#    sudo systemctl enable telegram-sender.service
+#    sudo systemctl start telegram-sender.service
+#
+# 4. Проверьте статус:
+#    sudo systemctl status telegram-sender.service
+#
+# 5. Просмотр логов:
+#    sudo journalctl -u telegram-sender.service -f
+
+[Unit]
+Description=Telegram Message Sender - Periodic message sender
+Documentation=https://github.com/your-repo/telegram-sender
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+Group=YOUR_GROUP
+
+# Рабочая директория (замените на актуальный путь)
+WorkingDirectory=/home/YOUR_USERNAME/telegram_sender
+
+# Путь к Python и скрипту
+ExecStart=/usr/bin/python3 /home/YOUR_USERNAME/telegram_sender/telegram_sender.py
+
+# Переменные окружения (ВАЖНО: замените на свои данные!)
+Environment="TELEGRAM_API_ID=YOUR_API_ID"
+Environment="TELEGRAM_API_HASH=YOUR_API_HASH"
+Environment="TELEGRAM_PHONE=+374XXXXXXXX"
+
+# Или используйте файл .env (если установлен python-dotenv):
+# EnvironmentFile=/home/YOUR_USERNAME/telegram_sender/.env
+
+# Автоматический перезапуск при падении
+Restart=always
+RestartSec=30
+
+# Настройки логирования
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=telegram-sender
+
+# Таймауты
+TimeoutStartSec=60
+TimeoutStopSec=30
+
+# Ограничения безопасности (опционально)
+# NoNewPrivileges=true
+# PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
